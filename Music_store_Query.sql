@@ -37,4 +37,28 @@ GROUP BY c.customer_id
 ORDER BY total_spending DESC
 LIMIT 1;
 
+/* Q6: What is the average total spending per invoice for each country? */
+SELECT billing_country, AVG(total) AS avg_total_spending
+FROM invoice
+GROUP BY billing_country
+ORDER BY avg_total_spending DESC;
+
+/* Q7: How many unique genres are there in the music store, and what are they? */
+SELECT COUNT(DISTINCT genre_id) AS unique_genre_count,
+       GROUP_CONCAT(DISTINCT name ORDER BY name ASC SEPARATOR ', ') AS unique_genres
+FROM genre;
+
+/* Q8: What are the top 5 customers based on their total spending, along with their rank? */
+SELECT customer_id, first_name, last_name, total_spending,
+       RANK() OVER (ORDER BY total_spending DESC) AS spending_rank
+FROM (
+    SELECT c.customer_id, c.first_name, c.last_name, SUM(total) AS total_spending
+    FROM customer c
+    JOIN invoice i ON c.customer_id = i.customer_id
+    GROUP BY c.customer_id, c.first_name, c.last_name
+) AS customer_spending
+ORDER BY spending_rank ASC
+LIMIT 5;
+
+
 
